@@ -28,6 +28,10 @@ const App = () => {
       bundle: true,
       write: false,
       plugins: [unpkgPathPlugin()],
+      define: {
+        'process.env.NODE_ENV': '"production"', // whenever we find "process.env.NODE_ENV" in the code, we should replace it with the string "production"
+        global: 'window', // setting for running inside the browser
+      },
     });
 
     console.log('result:', result);
