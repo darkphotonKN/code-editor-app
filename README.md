@@ -7,4 +7,4 @@ Online code editor that transpiles any code you write (react, es6+) and any file
 
 ### What was used to develop this app?
 ---
-Written in react + typescript and utilizing customized esbuild and plugins to help with transpiling and bundling code.
+Written in react + typescript and utilizing customized esbuild and plugins to help with transpiling and bundling user-submitted code.
