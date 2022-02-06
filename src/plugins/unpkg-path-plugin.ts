@@ -1,5 +1,12 @@
 import * as esbuild from 'esbuild-wasm';
 import axios from 'axios';
+import localForage from 'localforage';
+
+// using IndexedDB to store cached items for performance gains
+
+const fileCache = localForage.createInstance({
+  name: 'filecache',
+});
 
 export const unpkgPathPlugin = () => {
   return {
@@ -53,17 +60,30 @@ export const unpkgPathPlugin = () => {
             `,
           };
         } else {
+          // check if result was already cached before to prevent re-fetching data via network requests
+          const cachedResult = await fileCache.getItem(args.path); // using the (most often) unique paths as identifiers
+
+          if (cachedResult) {
+            return cachedResult;
+          }
+
+          // fetch the data via axios
           const { data, request } = await axios.get(args.path);
-          // request object from axios provides extra information
-          // we need the responseURL here to get the correct "importer" path for esbuild onResolve
-          // to create the correct path/namespace object for esbuild for nested imports/requires
+
           console.log('request:', request);
-          return {
+          const result = {
             loader: 'jsx',
             contents: data,
             // tells esbuild where we found the next package
+            // request object from axios provides extra information
+            // we need the responseURL here to get the correct "importer" path for esbuild onResolve
+            // to create the correct path/namespace object for esbuild for nested imports/requires
             resolveDir: new URL('.', request.responseURL).pathname, // onResolve will recieve this as a property in the object passed to it's function (args.path)
           };
+          // store as cache for later use, with the path as the key
+          await fileCache.setItem(args.path, result);
+
+          return result;
         }
       });
     },
