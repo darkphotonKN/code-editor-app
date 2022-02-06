@@ -61,7 +61,9 @@ export const unpkgPathPlugin = () => {
           };
         } else {
           // check if result was already cached before to prevent re-fetching data via network requests
-          const cachedResult = await fileCache.getItem(args.path); // using the (most often) unique paths as identifiers
+          const cachedResult = await fileCache.getItem<esbuild.OnLoadResult>(
+            args.path
+          ); // using the (most often) unique paths as identifiers
 
           if (cachedResult) {
             return cachedResult;
@@ -71,7 +73,7 @@ export const unpkgPathPlugin = () => {
           const { data, request } = await axios.get(args.path);
 
           console.log('request:', request);
-          const result = {
+          const result: esbuild.OnLoadResult = {
             loader: 'jsx',
             contents: data,
             // tells esbuild where we found the next package
