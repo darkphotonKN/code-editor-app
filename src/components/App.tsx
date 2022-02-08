@@ -24,10 +24,10 @@ const App = () => {
 
     // new build with our custom unpkg-path-plugin to help package everything together with esbuild's transpiled code
     const result = await ref.current.build({
-      entryPoints: ['index.js'],
+      entryPoints: ['index.js'], // telling esbuild the entry point to start building our code
       bundle: true,
       write: false,
-      plugins: [unpkgPathPlugin()],
+      plugins: [unpkgPathPlugin(input)], // provide our plugin for esbuild bundling our user's code from text area
       define: {
         'process.env.NODE_ENV': '"production"', // whenever we find "process.env.NODE_ENV" in the code, we should replace it with the string "production"
         global: 'window', // setting for running inside the browser
